@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS telefonos (
     FOREIGN KEY (cliente_id) REFERENCES Clientes(id)
 );
 
--- Tabla Ubicaciones (corregido el error de coma)
+-- Tabla Ubicaciones
 CREATE TABLE IF NOT EXISTS Ubicaciones (
     id INT PRIMARY KEY AUTO_INCREMENT,
     entidad_id INT NOT NULL,
@@ -33,7 +33,8 @@ CREATE TABLE IF NOT EXISTS DatosEmpleados (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(50),
     salario DECIMAL(10, 2),
-    fecha_contratacion DATE
+    fecha_contratacion DATE,
+    FOREIGN KEY (empleado_id) REFERENCES Empleado
 );
 
 CREATE TABLE IF NOT EXISTS Puestos (
@@ -43,14 +44,14 @@ CREATE TABLE IF NOT EXISTS Puestos (
     puesto VARCHAR(30)
 );
 
--- Tabla Proveedores (sin información de contacto)
+-- Tabla Proveedores
 CREATE TABLE IF NOT EXISTS Proveedores (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(30) UNIQUE,
     fecha_contratacion DATE
 );
 
--- Nueva tabla ContactosProveedores (relacionada con Proveedores)
+-- Nueva tabla ContactosProveedores (con relacion con Proveedores)
 CREATE TABLE IF NOT EXISTS ContactoProveedores (
     id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,      
     proveedor_id INT,                      
@@ -60,7 +61,7 @@ CREATE TABLE IF NOT EXISTS ContactoProveedores (
     FOREIGN KEY (proveedor_id) REFERENCES Proveedores(id)
 );
 
--- Tabla Categoría (debe estar antes de TiposProductos)
+-- Tabla Categoria
 CREATE TABLE IF NOT EXISTS categoria(
     id INT PRIMARY KEY AUTO_INCREMENT,
     posicion INT
@@ -103,7 +104,17 @@ CREATE TABLE IF NOT EXISTS Pedidos (
     FOREIGN KEY (cliente_id) REFERENCES Clientes(id)
 );
 
--- Tabla DetallesPedido (corregida referencia a `Precios`)
+-- Tabla Empleados_Pedidos (para poder relacionar los empleados con los pedidos)
+CREATE TABLE IF NOT EXISTS Empleados_Pedidos (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    empleado_id INT,
+    pedido_id INT,
+    FOREIGN KEY (empleado_id) REFERENCES DatosEmpleados(id) ON DELETE CASCADE,
+    FOREIGN KEY (pedido_id) REFERENCES Pedidos(id) ON DELETE CASCADE
+);
+
+
+-- Tabla DetallesPedido
 CREATE TABLE IF NOT EXISTS DetallesPedido (
     id INT PRIMARY KEY AUTO_INCREMENT,
     pedido_id INT,
@@ -134,7 +145,7 @@ CREATE TABLE IF NOT EXISTS HistorialDetalles (
 );
 
 -- Relación muchos a muchos entre empleados y proveedores (corregida referencia)
-CREATE TABLE Empleados_Proveedores (
+CREATE TABLE IF NOT EXISTS Empleados_Proveedores (
     empleado_id INT,
     proveedor_id INT,
     PRIMARY KEY (empleado_id, proveedor_id),
