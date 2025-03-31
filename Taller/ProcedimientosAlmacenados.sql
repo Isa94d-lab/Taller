@@ -14,6 +14,10 @@ BEGIN
 END $$
 DELIMITER ;
 
+--Prueba
+CALL ActualizarPrecioProveedor(1, 10);
+SELECT * FROM Productos WHERE proveedor_id = 1;
+
 --2. Obtener la dirección de un cliente por ID
 
 DELIMITER $$
@@ -27,6 +31,9 @@ BEGIN
     WHERE cd.cliente_id = clienteID;
 END $$
 DELIMITER ;
+
+--Prueba
+CALL ObtenerDireccionCliente(5);
 
 --3. Registrar un pedido nuevo y sus detalles
 
@@ -45,6 +52,9 @@ BEGIN
 END $$
 DELIMITER ;
 
+--Prueba
+CALL RegistrarPedido(3, 2, '2025-03-30', 500.00);
+
 --4. Calcular el total de ventas de un cliente
 
 DELIMITER $$
@@ -59,6 +69,9 @@ BEGIN
 END $$
 DELIMITER ;
 
+--Prueba
+CALL TotalVentasCliente(3);
+
 --5. Obtener empleados por puesto
 
 DELIMITER $$
@@ -72,6 +85,9 @@ BEGIN
     WHERE de.puesto_id = puestoID;
 END $$
 DELIMITER ;
+
+--Prueba
+CALL ObtenerEmpleadosPorPuesto(2);
 
 --6. Actualizar el salario de empleados por puesto
 
@@ -88,6 +104,11 @@ BEGIN
 END $$
 DELIMITER ;
 
+--Prueba
+CALL ActualizarSalarioPorPuesto(2, 5);
+SELECT * FROM Empleados;
+
+
 --7. Listar pedidos entre dos fechas
 
 DELIMITER $$
@@ -100,6 +121,9 @@ BEGIN
     WHERE fecha BETWEEN fechaInicio AND fechaFin;
 END $$
 DELIMITER ;
+
+--Prueba
+CALL ListarPedidosEntreFechas('2025-03-01', '2025-03-30');
 
 --8. Aplicar un descuento a productos de una categoría
 
@@ -115,6 +139,10 @@ BEGIN
 END $$
 DELIMITER ;
 
+--Prueba
+CALL AplicarDescuentoCategoria(1, 15);
+SELECT * FROM Productos WHERE tipo_id = 1;
+
 --9. Listar todos los proveedores de un tipo de producto
 
 DELIMITER $$
@@ -129,6 +157,9 @@ BEGIN
 END $$
 DELIMITER ;
 
+--Prueba
+CALL ListarProveedoresPorTipoProducto(3);
+
 --10. Obtener el pedido de mayor valor
 
 DELIMITER $$
@@ -140,3 +171,5 @@ BEGIN
 END $$
 DELIMITER ;
 
+--Prueba
+CALL PedidoMayorValor();
