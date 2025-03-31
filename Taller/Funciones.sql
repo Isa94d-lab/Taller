@@ -1,110 +1,160 @@
--- 1. Funcion que recibe una fecha y devuelve los dias transcurridos hasta hoy.
-DELIMITER //
+USE vtaszfs;
+
+--1. Días transcurridos desde una fecha
+
+DELIMITER $$
 CREATE FUNCTION DiasTranscurridos(fecha DATE) RETURNS INT
 DETERMINISTIC
 BEGIN
     RETURN DATEDIFF(CURDATE(), fecha);
-END//
+END $$
 DELIMITER ;
 
---------------------------------------------------
+--Prueba
+SELECT DiasTranscurridos('2024-01-01');
 
--- 2. Funcion para calcular el total con impuesto de un monto.
-DELIMITER //
-CREATE FUNCTION TotalConImpuesto(monto DECIMAL(10,2), tasa_impuesto DECIMAL(5,2)) RETURNS DECIMAL(10,2)
+
+--2. Calcular total con impuesto
+
+DELIMITER $$
+CREATE FUNCTION CalcularTotalConImpuesto(monto DECIMAL(10,2), impuesto DECIMAL(5,2)) RETURNS DECIMAL(10,2)
 DETERMINISTIC
 BEGIN
-    RETURN monto + (monto * tasa_impuesto);
-END//
+    RETURN monto * (1 + impuesto / 100);
+END $$
 DELIMITER ;
 
---------------------------------------------------
+--Prueba
+SELECT CalcularTotalConImpuesto(100, 19);
 
--- 3. Funcion que devuelve el total de pedidos de un cliente especifico.
-DELIMITER //
-CREATE FUNCTION TotalPedidosCliente(cliente INT) RETURNS INT
+
+--3. Total de pedidos de un cliente
+
+DELIMITER $$
+CREATE FUNCTION TotalPedidosCliente(clienteID INT) RETURNS INT
 DETERMINISTIC
 BEGIN
     DECLARE total INT;
-    SELECT COUNT(*) INTO total FROM Pedidos WHERE cliente_id = cliente;
+    SELECT COUNT(*) INTO total FROM Pedidos WHERE cliente_id = clienteID;
     RETURN total;
-END//
+END $$
 DELIMITER ;
 
---------------------------------------------------
+--Prueba
+SELECT TotalPedidosCliente(1);
 
--- 4. Funcion para aplicar un descuento a un producto.
-CREATE FUNCTION PrecioConDescuento(precio DECIMAL(10,2), descuento DECIMAL(5,2)) RETURNS DECIMAL(10,2)
+
+--4. Aplicar descuento a un producto
+
+DELIMITER $$
+CREATE FUNCTION AplicarDescuento(productoID INT, porcentaje DECIMAL(5,2)) RETURNS DECIMAL(10,2)
 DETERMINISTIC
 BEGIN
-    RETURN precio - (precio * descuento);
-END//
+    DECLARE nuevoPrecio DECIMAL(10,2);
+    SELECT precio * (1 - porcentaje / 100) INTO nuevoPrecio FROM Productos WHERE id = productoID;
+    RETURN nuevoPrecio;
+END $$
 DELIMITER ;
 
---------------------------------------------------
+--Prueba
+SELECT AplicarDescuento(3, 10);
 
--- 5. Funcion que indica si un cliente tiene direccion registrada en la tabla Ubicaciones.
-DELIMITER //
-CREATE FUNCTION ClienteTieneDireccion(cliente INT) RETURNS TINYINT
+
+--5. Verificar si un cliente tiene dirección registrada
+
+DELIMITER $$
+CREATE FUNCTION ClienteTieneDireccion(clienteID INT) RETURNS BOOLEAN
 DETERMINISTIC
 BEGIN
-    DECLARE existe INT;
-    SELECT COUNT(*) INTO existe 
-    FROM Ubicaciones 
-    WHERE entidad_id = cliente AND tipo_entidad = 'Cliente';
-    RETURN IF(existe > 0, 1, 0);
-END//
+    DECLARE tieneDireccion BOOLEAN;
+    SELECT COUNT(*) > 0 INTO tieneDireccion FROM ClientesDireccion WHERE cliente_id = clienteID;
+    RETURN tieneDireccion;
+END $$
 DELIMITER ;
 
---------------------------------------------------
+--Prueba
+SELECT ClienteTieneDireccion(2);
 
--- 6. Funcion que devuelve el salario anual de un empleado.
-DELIMITER //
-CREATE FUNCTION SalarioAnual(empleado INT) RETURNS DECIMAL(10,2)
+
+--6. Calcular salario anual de un empleado
+
+DELIMITER $$
+CREATE FUNCTION SalarioAnual(empleadoID INT) RETURNS DECIMAL(10,2)
 DETERMINISTIC
 BEGIN
     DECLARE salario DECIMAL(10,2);
-    SELECT salario INTO salario FROM DatosEmpleados WHERE id = empleado;
-    RETURN salario * 12;
-END//
+    SELECT salario * 12 INTO salario FROM Empleados WHERE id = empleadoID;
+    RETURN salario;
+END $$
 DELIMITER ;
 
---------------------------------------------------
+--Prueba
+SELECT SalarioAnual(5);
 
--- 7. Funcion para calcular el total de ventas de un tipo de producto.
-DELIMITER //
-CREATE FUNCTION VentasPorTipo(tipo INT) RETURNS DECIMAL(10,2)
+
+--7. Total de ventas de un tipo de producto
+
+DELIMITER $$
+CREATE FUNCTION TotalVentasTipoProducto(tipoID INT) RETURNS DECIMAL(10,2)
 DETERMINISTIC
 BEGIN
     DECLARE total DECIMAL(10,2);
-    SELECT IFNULL(SUM(dp.cantidad * p.precio),0)
-    INTO total
+    SELECT SUM(dp.cantidad * dp.precio) INTO total
     FROM DetallesPedido dp
-    JOIN Productos p ON dp.producto_id = p.id
-    WHERE p.tipo_id = tipo;
+    INNER JOIN Productos p ON dp.producto_id = p.id
+    WHERE p.tipo_id = tipoID;
     RETURN total;
-END//
+END $$
 DELIMITER ;
 
---------------------------------------------------
+--Prueba
+SELECT TotalVentasTipoProducto(2);
 
--- 8. Funcion que devuelve el nombre de un cliente por su ID.
-DELIMITER //
-CREATE FUNCTION NombreClientePorID(cliente INT) RETURNS VARCHAR(100)
+
+--8. Obtener nombre de un cliente por ID
+
+DELIMITER $$
+CREATE FUNCTION NombreCliente(clienteID INT) RETURNS VARCHAR(100)
 DETERMINISTIC
 BEGIN
     DECLARE nombre VARCHAR(100);
-    SELECT c.nombre INTO nombre FROM Clientes c WHERE c.id = cliente;
+    SELECT nombre INTO nombre FROM Clientes WHERE id = clienteID;
     RETURN nombre;
-END//
+END $$
 DELIMITER ;
 
---------------------------------------------------
+--Prueba
+SELECT NombreCliente(1);
 
--- 9. Funcion que recibe el ID de un pedido y devuelve su total.
-DELIMITER //
-CREATE FUNCTION TotalPedido(pedido INT) RETURNS DECIMAL(10,2)
+
+--9. Total de un pedido por ID
+
+DELIMITER $$
+CREATE FUNCTION TotalPedido(pedidoID INT) RETURNS DECIMAL(10,2)
 DETERMINISTIC
 BEGIN
     DECLARE total DECIMAL(10,2);
-    SELECT
+    SELECT SUM(cantidad * precio) INTO total FROM DetallesPedido WHERE pedido_id = pedidoID;
+    RETURN total;
+END $$
+DELIMITER ;
+
+--Prueba
+SELECT TotalPedido(10);
+
+
+--10. Verificar si un producto está en inventario
+
+DELIMITER $$
+CREATE FUNCTION ProductoEnInventario(productoID INT) RETURNS BOOLEAN
+DETERMINISTIC
+BEGIN
+    DECLARE enInventario BOOLEAN;
+    SELECT COUNT(*) > 0 INTO enInventario FROM DetallesPedido WHERE producto_id = productoID;
+    RETURN enInventario;
+END $$
+DELIMITER ;
+
+--Prueba
+SELECT ProductoEnInventario(4);
+

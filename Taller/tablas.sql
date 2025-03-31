@@ -1,6 +1,6 @@
-
-CREATE DATABASE vtaszfs1;
-USE vtaszfs1;
+--Creacion de la base de datos
+CREATE DATABASE vtaszfs;
+USE vtaszfs;
 
 -- Tabla Clientes
 CREATE TABLE IF NOT EXISTS Clientes (

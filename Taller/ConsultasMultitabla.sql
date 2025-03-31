@@ -1,4 +1,4 @@
-USE vtaszfs1;
+USE vtaszfs;
 
 --1. Listar todos los pedidos y el cliente asociado
 

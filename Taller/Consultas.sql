@@ -1,6 +1,6 @@
 --consultas simples
 
-USE vtaszfs
+USE vtaszfs;
 
 -- 1. Seleccionar todos los productos con precio mayor a $50
 SELECT * 

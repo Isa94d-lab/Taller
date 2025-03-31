@@ -1,4 +1,4 @@
-USE vtaszfs1;
+USE vtaszfs;
 
 --1. Actualizar el precio de todos los productos de un proveedor
 

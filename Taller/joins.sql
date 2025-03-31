@@ -1,4 +1,4 @@
-USE vtaszfs 
+USE vtaszfs ;
 
 -- 1. Obtener la lista de todos los pedidos con los nombres de clientes usando INNER JOIN
 SELECT Pedidos.id, Clientes.nombre AS cliente, Pedidos.fecha, Pedidos.total

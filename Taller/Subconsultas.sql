@@ -1,4 +1,4 @@
-USE vtaszfs1;
+USE vtaszfs;
 
 -- 1. Consultar el producto más caro en cada categoría.
 SELECT * FROM Productos p

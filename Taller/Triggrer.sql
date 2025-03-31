@@ -1,4 +1,4 @@
-USE vtaszfs1;
+USE vtaszfs;
 
 --1. Registrar cambios de salario en HistorialSalarios
 
