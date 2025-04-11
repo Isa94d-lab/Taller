@@ -11,20 +11,22 @@ FROM Productos
 INNER JOIN Proveedores ON Productos.proveedor_id = Proveedores.id;
 
 -- 3. Mostrar los pedidos y las ubicaciones de los clientes con LEFT JOIN
-SELECT p.id AS pedido_id, p.fecha, p.total, c.nombre AS cliente_nombre, u.direccion, u.ciudad, u.estado, u.codigo_postal, u.pais
-FROM Pedidos p
-LEFT JOIN Clientes c ON p.cliente_id = c.id
-LEFT JOIN Ubicaciones u ON c.id = u.entidad_id AND u.tipo_entidad = 'Cliente';
+SELECT Pedidos.id AS id_pedido, Pedidos.fecha, Pedidos.total, Clientes.nombre AS nombre_cliente,
+       Ubicaciones.direccion, Ubicaciones.ciudad, Ubicaciones.estado, Ubicaciones.codigo_postal, Ubicaciones.pais
+FROM Pedidos
+LEFT JOIN Clientes ON Pedidos.cliente_id = Clientes.id
+LEFT JOIN Ubicaciones ON Clientes.id = Ubicaciones.entidad_id AND Ubicaciones.tipo_entidad = 'Cliente';
 
 
 -- 4. Consultar los empleados que han registrado pedidos, incluyendo empleados sin pedidos (LEFT JOIN)
-SELECT e.id AS empleado_id, e.nombre AS empleado_nombre, e.salario, e.fecha_contratacion, p.id AS pedido_id, p.fecha AS fecha_pedido, p.total AS total_pedido
-FROM DatosEmpleados e
-LEFT JOIN Pedidos p ON e.id = p.cliente_id;
- 
+SELECT DatosEmpleados.id AS id_empleado, DatosEmpleados.nombre AS nombre_empleado, DatosEmpleados.salario,
+       DatosEmpleados.fecha_contratacion, Pedidos.id AS id_pedido, Pedidos.fecha AS fecha_pedido, Pedidos.total AS total_pedido
+FROM DatosEmpleados
+LEFT JOIN Pedidos ON DatosEmpleados.id = Pedidos.empleado_id;
+
 
 -- 5. Obtener el tipo de producto y los productos asociados con INNER JOIN
-SELECT TiposProductos.tipo_nombre, Productos.nombre AS producto
+SELECT TiposProductos.tipo_nombre, Productos.nombre AS nombre_producto
 FROM TiposProductos
 INNER JOIN Productos ON Productos.tipo_id = TiposProductos.id;
 
@@ -34,10 +36,11 @@ FROM Clientes
 LEFT JOIN Pedidos ON Clientes.id = Pedidos.cliente_id
 GROUP BY Clientes.id, Clientes.nombre;
 
+
 -- 7. Combinar Pedidos y Empleados para mostrar qué empleados gestionaron pedidos específicos
-SELECT Empleados_Pedidos.empleado_id, DatosEmpleados.nombre , Empleados_Pedidos.pedido_id 
-FROM DatosEmpleados
-INNER JOIN Empleados_Pedidos ON DatosEmpleados.id = Empleados_Pedidos.empleado_id;
+SELECT DatosEmpleado.id AS id_empleado, DatosEmpleado.nombre AS nombre_empleado, Pedidos.id AS id_pedido
+FROM DatosEmpleado
+INNER JOIN Pedidos ON DatosEmpleado.id = Pedidos.empleado_id;
 
 
 -- 8. Mostrar productos que no han sido pedidos (RIGHT JOIN)
@@ -48,12 +51,12 @@ WHERE DetallesPedido.producto_id IS NULL;
 
 -- 9. Mostrar el total de pedidos y ubicación de clientes usando múltiples JOIN
 
-SELECT Clientes.id, Clientes.nombre, COUNT(Pedidos.id), Ubicaciones.direccion, Ubicaciones.ciudad, Ubicaciones.estado
+SELECT Clientes.id, Clientes.nombre, COUNT(Pedidos.id), Direcciones.direccion, Direcciones.ciudad, Direcciones.estado
 FROM Clientes
 LEFT JOIN Pedidos ON Clientes.id = Pedidos.cliente_id
-LEFT JOIN Ubicaciones ON Ubicaciones.entidad_id = Clientes.id 
-    AND Ubicaciones.tipo_entidad = 'Cliente'
-GROUP BY Clientes.id, Clientes.nombre, Ubicaciones.direccion, Ubicaciones.ciudad, Ubicaciones.estado;
+LEFT JOIN ClientesDireccion ON Clientes.id = ClientesDireccion.cliente_id
+LEFT JOIN Direcciones ON ClientesDireccion.direccion_id = Direcciones.id
+GROUP BY Clientes.id, Clientes.nombre, Direcciones.direccion, Direcciones.ciudad, Direcciones.estado;
 
 
 
